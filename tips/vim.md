@@ -1,0 +1,4 @@
+- Use `gd` to jump to definition of the word under cursor
+- Use `Ctrl+o` to jump back to the previous position
+- Use `gd` to jump to definition of the word under cursor
+- Use `Ctrl+o` to jump back to the previous position
