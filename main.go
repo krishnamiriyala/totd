@@ -43,25 +43,32 @@ type Tip struct {
 }
 
 //go:embed tips.db
-var dbContent []byte
+var dbContent string
+
+//go:embed LICENSE
+var license string
 
 func main() {
 	// Command-line flags
 	addTip := flag.String("add", "", "Add a new tip to the specified category")
 	category := flag.String("category", "vim", "Category for reading tips")
 	dump := flag.Bool("dump", false, "Dump tips to files under 'tips' directory")
-
+	printLicense := flag.Bool("license", false, "Print license")
 	flag.Parse()
+	if *printLicense {
+		fmt.Println(license)
+		return
+	}
 
 	// Load the embedded SQLite database
 	dbPath := "/tmp/_totd_tips.db"
-	if err := os.WriteFile(dbPath, dbContent, 0644); err != nil {
+	if err := os.WriteFile(dbPath, []byte(dbContent), 0644); err != nil {
 		fmt.Println("Error extracting database:", err)
 		return
 	}
 
 	// Connect to the SQLite database using GORM
-	db, err := gorm.Open(sqlite.Open("tips.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
 	if err != nil {
 		fmt.Println("Error opening database:", err)
 		return
@@ -147,17 +154,25 @@ func dumpTips(db *gorm.DB) error {
 		return result.Error
 	}
 
+	files := make(map[string]*os.File)
 	for _, tip := range tips {
-		// Create or open the file for writing
+		if _, ok := files[tip.Category]; ok {
+			continue
+		}
+		// Create the file for writing
 		file, err := os.OpenFile(fmt.Sprintf("tips/%s.md", tip.Category), os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			return err
 		}
 		defer file.Close()
+		files[tip.Category] = file
+	}
+
+	for _, tip := range tips {
+		file := files[tip.Category]
 
 		// Write the tip to the file
-		_, err = file.WriteString("- " + tip.Content + "\n")
-		if err != nil {
+		if _, err := file.WriteString("- " + tip.Content + "\n"); err != nil {
 			return err
 		}
 	}
