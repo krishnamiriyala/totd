@@ -20,10 +20,35 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package cmd
 
-import "github.com/krishnamiriyala/totd/cmd"
+import (
+	"fmt"
 
-func main() {
-	cmd.Execute()
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+)
+
+func connectToDB() (db *gorm.DB) {
+	dbPath := "/tmp/_totd_tips.db"
+
+	// Connect to the SQLite database using GORM
+	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{})
+	if err != nil {
+		fmt.Println("Error opening database:", err)
+		return
+	}
+	_, err = db.DB()
+	if err != nil {
+		fmt.Println("Error getting database handle:", err)
+		return
+	}
+
+	// Auto Migrate the schema
+	err = db.AutoMigrate(&Tip{})
+	if err != nil {
+		fmt.Println("Error migrating database:", err)
+		return
+	}
+	return
 }

@@ -20,10 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-package main
+package cmd
 
-import "github.com/krishnamiriyala/totd/cmd"
+import (
+	"fmt"
 
-func main() {
-	cmd.Execute()
+	"github.com/spf13/cobra"
+)
+
+var category string
+var content string
+
+// addCmd represents the add command
+var addCmd = &cobra.Command{
+	Use:   "add",
+	Short: "Add Tips",
+	Run: func(cmd *cobra.Command, args []string) {
+		db := connectToDB()
+		sqlDB, err := db.DB()
+		if err != nil {
+			fmt.Println("Error getting database handle:", err)
+			return
+		}
+		defer sqlDB.Close()
+		if err = addTipToDB(db, content, category); err != nil {
+			fmt.Println("Error dumping tips:", err)
+		}
+	},
+}
+
+func init() {
+	rootCmd.AddCommand(addCmd)
+	addCmd.Flags().StringVar(&category, "category", "vim", "Tip's category")
+	addCmd.Flags().StringVar(&content, "content", "", "Tip's content")
 }

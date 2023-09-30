@@ -2,3 +2,8 @@
 - Use `Ctrl+o` to jump back to the previous position
 - Use `dd` to delete current line
 - Use `dt<char|space>` to delete from the cursor to next char or space provided
+- Use `dw` delete the word under the cursor
+- Press `i` to enter insert mode before the cursor
+- Press `I` to enter insert mode at the beginning of the current line
+- Press `o` to open a new line below the current line and enter insert mode
+- Press `O` to open a new line above the current line and enter insert mode
