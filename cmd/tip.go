@@ -34,7 +34,7 @@ import (
 )
 
 type Tip struct {
-	ID        string `gorm:"autoincrement"`
+	ID        string `gorm:"autoIncrement"`
 	Category  string `gorm:"primaryKey"`
 	Content   string `gorm:"primaryKey"`
 	UpdatedAt time.Time

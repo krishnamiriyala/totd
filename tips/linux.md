@@ -1,0 +1,1 @@
+- List files in sorted order by size `ls -ltrh`
